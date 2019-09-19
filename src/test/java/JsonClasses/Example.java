@@ -5,6 +5,7 @@ import java.util.List;
 
 import ApiTests.ApiTestExample;
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.annotations.Expose;
 import com.google.gson.annotations.SerializedName;
 import io.restassured.RestAssured;
@@ -73,7 +74,14 @@ public class Example extends ApiTestExample {
         return data;
     }
 
+    public List<JsonClasses.Datum> getJsonData() {
+        return data;
+    }
+
     public void setData(List<JsonClasses.Datum> data) {
+        this.data = data;
+    }
+    public void SetJsonData(List<JsonClasses.Datum> data) {
         this.data = data;
     }
 
@@ -93,6 +101,19 @@ public class Example extends ApiTestExample {
         return response;
 
 
+    }
+    public void SetList() {
+
+        String exampleTestJsonData = null;
+
+        RestAssured.baseURI = "https://reqres.in";
+        Response response = given()
+                .contentType("application/json")
+                .body(exampleTestJsonData)
+                .when()
+                .post("/api/setlist")
+                .then()
+                .extract().response();
     }
 
     @Test
@@ -119,5 +140,35 @@ public class Example extends ApiTestExample {
 
     }
 
+    @Test
+    public void SetData(){
+
+
+        Response response = GetList();
+        String result = response.jsonPath().prettify();
+
+        Gson gson = new GsonBuilder()
+                .setPrettyPrinting()
+                .create();
+        Example exampleTestClass = gson.fromJson(result, Example.class);
+        exampleTestClass.setPage(30);
+        exampleTestClass.setPerPage(88);
+        exampleTestClass.setTotal(30000);
+        exampleTestClass.setTotalPages(8);
+
+        for (Datum data : exampleTestClass.getData()){
+
+            data.setId(10);
+            data.setName("Sarı");
+            data.setYear(5000);
+            data.setColor("#99999999");
+            data.setPantoneValue("Buralar hep pantone value");
+
+        }
+        String exampleTestJsonData = (gson.toJson(exampleTestClass));
+
+        System.out.println(exampleTestJsonData);
+
+    }
 
 }
